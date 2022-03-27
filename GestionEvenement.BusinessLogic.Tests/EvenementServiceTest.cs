@@ -20,12 +20,12 @@ namespace GestionEvenement.BusinessLogic.Tests
         private readonly Fixture _fixture = new();
         private readonly Mock<IMapper> _mockMapper = new();
         private readonly Mock<IUnitOfWork> _mockUnitOfWork = new();
-        private IEvenementService _mockEvenementService;
+        private IEvenementService _evenementService;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _mockEvenementService = new EvenementService(_mockUnitOfWork.Object, _mockMapper.Object);
+            _evenementService = new EvenementService(_mockUnitOfWork.Object, _mockMapper.Object);
         }
 
         private Evenement CreateEvenement()
@@ -83,11 +83,11 @@ namespace GestionEvenement.BusinessLogic.Tests
             var evenements = _fixture.CreateMany<Evenement>();
             var expected = _fixture.CreateMany<EvenementDto>();
 
-            _mockUnitOfWork.Setup(p => p.Evenement.GetAll(null, null, null)).Returns(evenements);
+            _mockUnitOfWork.Setup(p => p.Evenement.GetAll()).Returns(evenements);
             _mockMapper.Setup(p => p.Map<IEnumerable<EvenementDto>>(evenements)).Returns(expected);
 
             //Act
-            var actual = _mockEvenementService.GetAll();
+            var actual = _evenementService.GetAll();
 
             //Assert
             actual.Should().BeEquivalentTo(expected);
@@ -105,7 +105,7 @@ namespace GestionEvenement.BusinessLogic.Tests
             _mockMapper.Setup(p => p.Map<EvenementDto>(evenement)).Returns(expected);
 
             //Act
-            var actual = _mockEvenementService.GetById(Id);
+            var actual = _evenementService.GetById(Id);
 
             //Assert
             actual.Should().BeEquivalentTo(expected);
@@ -129,7 +129,7 @@ namespace GestionEvenement.BusinessLogic.Tests
             _mockMapper.Setup(p => p.Map<EvenementDto>(evenement)).Returns(evenementDto);
 
             //Act
-            var actual = _mockEvenementService.GetById(Id);
+            var actual = _evenementService.GetById(Id);
 
             //Assert
             actual.StartDateAndTime.Should().Be(expectedStartDateAndTime);
@@ -139,37 +139,47 @@ namespace GestionEvenement.BusinessLogic.Tests
         [TestMethod]
         public void Add_ValidateEventAndNotThrowException()
         {
+            //Arrange
             var evenementDto = CreateEvenementDto();
 
-            Action action = () => _mockEvenementService.Add(evenementDto);
+            //Act
+            Action action = () => _evenementService.Add(evenementDto);
 
+            //Arrange
             action.Should().NotThrow<ValidationException>();
         }
 
         [TestMethod]
         public void Add_ValidateNameLengthAndThrowException()
         {
+            //Arrange
             var evenementDto = CreateEvenementDto();
             evenementDto.Name += _fixture.Build<string>();
 
-            Action action = () => _mockEvenementService.Add(evenementDto);
+            //Act
+            Action action = () => _evenementService.Add(evenementDto);
 
+            //Assert
             action.Should().Throw<ValidationException>().WithMessage(StaticHelper.NameMaxLengthErrorMessage);
         }
 
         [TestMethod]
         public void Add_ValidateStartAndEndDateAndThrowException()
         {
+            //Arrange
             var evenementDto = CreateEvenementDto();
             evenementDto.EndDateAndTime = evenementDto.StartDateAndTime.AddHours(-1);
 
-            Action action = () => _mockEvenementService.Add(evenementDto);
+            //Act
+            Action action = () => _evenementService.Add(evenementDto);
 
+
+            //Assert
             action.Should().Throw<ValidationException>().WithMessage(StaticHelper.StartEndDateComparisonErrorMessage);
         }
 
         [TestMethod]
-        public void Add_CallUnitOfWorkAddMethodAndReturnTheExpectedId()
+        public void Add_CallUnitOfWorkAddMethod()
         {
             //Arrange
             var evenementDto = CreateEvenementDto();
@@ -180,10 +190,27 @@ namespace GestionEvenement.BusinessLogic.Tests
             _mockUnitOfWork.Setup(p => p.Evenement.Add(It.IsAny<Evenement>()));
 
             //Act
-            var actual = _mockEvenementService.Add(evenementDto);
+            var actual = _evenementService.Add(evenementDto);
 
             //Assert
             _mockUnitOfWork.Verify(u => u.Evenement.Add(evenement), Times.Once());
+        }
+
+        [TestMethod]
+        public void Add_ReturnTheExpectedId()
+        {
+            //Arrange
+            var evenementDto = CreateEvenementDto();
+            var evenement = MapEvenement(evenementDto);
+            var expected = evenement.Id;
+
+            _mockMapper.Setup(p => p.Map<Evenement>(evenementDto)).Returns(evenement);
+            _mockUnitOfWork.Setup(p => p.Evenement.Add(It.IsAny<Evenement>()));
+
+            //Act
+            var actual = _evenementService.Add(evenementDto);
+
+            //Assert
             actual.Should().Be(expected);
         }
 
@@ -201,7 +228,7 @@ namespace GestionEvenement.BusinessLogic.Tests
             _mockUnitOfWork.Setup(p => p.Evenement.Add(It.IsAny<Evenement>()));
 
             //Act
-            var actual = _mockEvenementService.Add(evenementDto);
+            var actual = _evenementService.Add(evenementDto);
 
             //Assert
             evenement.StartDateAndTime.Should().Be(expectedStartDateAndTime);
@@ -219,7 +246,7 @@ namespace GestionEvenement.BusinessLogic.Tests
             _mockUnitOfWork.Setup(p => p.Evenement.Update(It.IsAny<Evenement>()));
 
             //Act
-            _mockEvenementService.Update(evenementDto);
+            _evenementService.Update(evenementDto);
 
             //Assert
             _mockUnitOfWork.Verify(u => u.Evenement.Update(evenement), Times.Once());
@@ -234,7 +261,7 @@ namespace GestionEvenement.BusinessLogic.Tests
             _mockUnitOfWork.Setup(p => p.Evenement.Delete(evenementDto.Id));
 
             //Act
-            _mockEvenementService.Delete(evenementDto.Id);
+            _evenementService.Delete(evenementDto.Id);
 
             //Assert
             _mockUnitOfWork.Verify(u => u.Evenement.Delete(evenementDto.Id), Times.Once());

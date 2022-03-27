@@ -20,7 +20,7 @@ namespace GestionEvenement.Areas.Admin.Controllers
             return View();
         }
 
-        public IActionResult AddOrEdit(Guid? id)
+        public IActionResult AddOrEdit(Guid? id = null)
         {
             EvenementDto evenementDto = new();
             if (id != null)

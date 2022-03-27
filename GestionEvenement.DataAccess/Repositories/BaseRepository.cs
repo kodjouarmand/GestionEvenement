@@ -29,28 +29,9 @@ namespace GestionEvenement.DataAccess.Repositories.Contracts
             return dbSet.Find(id);
         }
 
-        public IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null)
+        public IEnumerable<TEntity> GetAll()
         {
-            IQueryable<TEntity> query = dbSet;
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            if (includeProperties != null)
-            {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(includeProp);
-                }
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            return query.ToList();
+            return dbSet.ToList();
         }
 
         public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, string includeProperties = null)

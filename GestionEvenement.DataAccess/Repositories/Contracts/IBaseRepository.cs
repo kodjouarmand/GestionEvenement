@@ -10,9 +10,7 @@ namespace GestionEvenement.DataAccess.Repositories.Contracts
     {
         TEntity GetById(TEntityKey id);
 
-        IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> fliter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = null);
+        IEnumerable<TEntity> GetAll();
 
         IQueryable<TEntity> Get( Expression<Func<TEntity, bool>> fliter = null,
            string includeProperties = null);
