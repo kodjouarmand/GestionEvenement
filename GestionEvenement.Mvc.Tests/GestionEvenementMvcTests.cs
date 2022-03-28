@@ -7,7 +7,6 @@ using Moq;
 using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
 using System;
-using GestionEvenement.Mvc.Helpers;
 
 namespace GestionEvenement.Mvc.Tests
 {

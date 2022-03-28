@@ -1,6 +1,5 @@
 ﻿using GestionEvenement.Utility;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GestionEvenement.Domain.Assemblers

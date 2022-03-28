@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GestionEvenement.BusinessLogic.Enums;
 using GestionEvenement.BusinessLogic.Exceptions;
 using GestionEvenement.DataAccess;
 using GestionEvenement.Domain.Assemblers;
@@ -7,7 +6,6 @@ using GestionEvenement.Domain.Entities;
 using GestionEvenement.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace GestionEvenement.BusinessLogic.Services.Contracts
@@ -51,6 +49,10 @@ namespace GestionEvenement.BusinessLogic.Services.Contracts
             if (evenementDto.StartDateAndTime == default)
             {
                 validationErrors.Append(StaticHelper.StartDateAndTimeRequiredErrorMessage);
+            }
+            if (DateTime.Now > evenementDto.StartDateAndTime)
+            {
+                validationErrors.Append(StaticHelper.StartDateComparisonErrorMessage);
             }
             if (evenementDto.EndDateAndTime == default)
             {
